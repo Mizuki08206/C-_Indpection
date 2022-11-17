@@ -1,0 +1,8 @@
+C:\Users\mizuk\source\repos\Inspection\Inspection\obj\Debug\Inspection.csproj.AssemblyReference.cache
+C:\Users\mizuk\source\repos\Inspection\Inspection\obj\Debug\Inspection.csproj.SuggestedBindingRedirects.cache
+C:\Users\mizuk\source\repos\Inspection\Inspection\obj\Debug\Inspection.csproj.CoreCompileInputs.cache
+C:\Users\mizuk\source\repos\Inspection\Inspection\bin\Debug\Inspection.exe.config
+C:\Users\mizuk\source\repos\Inspection\Inspection\bin\Debug\Inspection.exe
+C:\Users\mizuk\source\repos\Inspection\Inspection\bin\Debug\Inspection.pdb
+C:\Users\mizuk\source\repos\Inspection\Inspection\obj\Debug\Inspection.exe
+C:\Users\mizuk\source\repos\Inspection\Inspection\obj\Debug\Inspection.pdb
