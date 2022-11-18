@@ -12,8 +12,10 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
 namespace Inspection
 {
+    
     internal class Inspection
     {
+
         static void Main(string[] args)
         {
             //A();
@@ -30,11 +32,114 @@ namespace Inspection
             //M();
             //N();
             //O();
+            //P();
+            //Q();
+            //Start();
+            S();
 
+        }
+        public static void T()
+        {
+            
+        }
+        public static void S()//匿名型
+        {
+            //匿名型はvarでしか宣言できない。
+            //varにカーソルを当てるとAnonymouseTypeとなっている
+            var data = new { No = 1, Name = "Suzuki" };
+            Console.WriteLine("{0}：{1}", data.No, data.Name);
+        }
+        private static int Add(int x, int y)
+        {
+            return x + y;
+        }
+        public static void Start()
+        {
+            // 関数をデリゲートに登録
+            Func<int, int, int> func1 = Add;
+
+            // ラムダ式で作った関数を登録
+            Func<int, int, int> func2 = (x, y) => x + y;//なぜAddが登録される？
+
+            // 呼び出し
+            Console.WriteLine(func1(10, 20));
+            Console.WriteLine(func2(50, 20));
+        }
+        public static void R()//CS-32 デリゲート
+        {
+            //デリゲートは参照型のため、nullもOK
+            //ポリモーフィズムをメソッドレベルで実現できる
+            //フォームアプリを作成する際の、EventHandler<T>もデリゲートで、変数に入れて利用している
+            //デリゲートがなくてもインターフェースでもできる
+            //実行するメソッドを自由に差し替えて実行させる
+            Action<int> a1 = Console.WriteLine;//Action<T>で指定した型でのみ、メソッドを呼び出せる
+            a1(123);
+            Action<string> a2 = Console.WriteLine;
+            a2("string");
+
+        }
+        public static void Q()//コレクション（キュー、スタック、リスト、ディクショナリ）
+        {
+            List<int> list = new List<int>();
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            Stack<int> stack = new Stack<int>();
+            Queue<int> queue = new Queue<int>();
+
+            for(int i=0;i<20;i++)
+            {
+                list.Add(i);
+                dic.Add(i, "Hello");
+                stack.Push(i);
+                queue.Enqueue(i);
+            }
+
+            Console.WriteLine(stack.Pop());//取り出して削除される
+            Console.WriteLine("=============");
+
+            foreach (var s in stack)//list,dic,stack,queueを入れ替えて取り出し順を見る
+            {
+                Console.WriteLine(s);
+            }
+        }
+        public static void P()//CS-30 null関係の演算子
+        {
+            //三項演算子
+            //条件式　?　真の場合の値（式） : 偽の場合の値（式）
+            //①
+            int? tmp = null;
+            var num1=tmp.HasValue? tmp.Value : 0;
+            Console.WriteLine(num1);
+
+            //これと同じことがメソッドで用意されている
+            //②
+            int? num2 = null;
+            Console.WriteLine(num2.GetValueOrDefault());
+            //GetValueOrDefault()はnullでなければValue、nullであればdefault値を返す
+            
+            //③
+            //??演算子
+            int?  num3= null;
+            Console.WriteLine(num3 ?? 101);
+            //num3がnullでなければnum3の値を、nullであれば101を返す
+            //演算子のため、普通の参照型にも使用できる
+            //var message = errorMessage ?? "正常終了" ;
+
+            //①と②と③は同じ処理
+
+            string str = null;
+            Console.WriteLine("--{0}---",str);
+            //str ??= "default string";//C# 8.0以上のバージョンが必要
+
+            //?.演算子
+            //途中の式がの結果がnullになった場合に、最終的な結果をnullとする。
+            //例えば
+            Person p = new Person();
+            var s = p.Partner?.Company?.President.Partner?.Name ?? "is null";
+            Console.WriteLine(s ?? "nullです");
 
 
         }
-        public static void O()
+        public static void O()//CS-29 ジェネリック
         {
             var num = NullReturn();//numはNullable型のため、HasValueが使用できる
             if (num.HasValue)
@@ -386,10 +491,18 @@ namespace Inspection
             return "Morning";
         }
     }
+    public class Company
+    {
+        public string Name { get; set; }
+        public Person President { get; set; }//Companyクラスのメンバにすべき
+    }
     public class Person
     {
         public string Name { get; set; }
         public int Age { get; set; }
+        public Person Partner { get; set; }
+        public Company Company { get; set; }
+        
         public Person()
         {
         }
