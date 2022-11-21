@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
@@ -40,7 +41,7 @@ namespace Inspection
             //T();
 
             Address ad = new Address();
-            ad.Help();
+            ad.Sub();
 
         }
         public static void T()
@@ -733,41 +734,105 @@ namespace Inspection
     //----------------------------------------------------
     public class Address
     {
-        public Dictionary<string, List<string>> Command { get; set; } = new Dictionary<string, List<string>>();
+        public Dictionary<string, List<string>> CommandList { get; set; } = new Dictionary<string, List<string>>();
         public List<Data> datalist=new List<Data>();
 
-        public Address()//コマンドの格納（ここは省略できない気がする...）
+        public Address()//コマンドの格納（ここは省略できない気がする...）とメソッドの格納
         {
-            Command[":list （一覧表示コマンド）"] = new List<string>() {"現在登録されている住所録データをすべて表示する",
+            CommandList[":list （一覧表示コマンド）"] = new List<string>() {"現在登録されている住所録データをすべて表示する",
                 "表示形式は、先頭に通し番号（1スタート）を表示したうえで、登録された情報を半角スペース区切りで表示する" };
-            Command[":exit （終了コマンド）"] = new List<string>() { "アプリケーションを終了する" };
-            Command[":delete no （削除コマンド）"] = new List<string>() { "noで指定された通し番号（一覧表示時のNo）のデータを削除する",
+            CommandList[":exit （終了コマンド）"] = new List<string>() { "アプリケーションを終了する" };
+            CommandList[":delete no （削除コマンド）"] = new List<string>() { "noで指定された通し番号（一覧表示時のNo）のデータを削除する",
                 "削除後、通し番号は先頭から振り直される",
                 "追加の情報は、半角スペースの後に続く仕様とする" };
-            Command[":sort 項目名 （ソートコマンド）"] = new List<string>() { "項目名で指定された項目の昇順でデータをソートする",
+            CommandList[":sort 項目名 （ソートコマンド）"] = new List<string>() { "項目名で指定された項目の昇順でデータをソートする",
                 "有効な項目名は name,age,telno,address のいずれかとする" };
-            Command[":save ファイルパス （ファイル保存コマンド）"] = new List<string>() { "指定されたテキストファイルに現在登録されている住所録情報を保存する" };
-            Command[":load ファイルパス （ファイル読み込みコマンド）"] = new List<string>() { "指定されたテキストファイルから住所録データを読み込む",
+            CommandList[":save ファイルパス （ファイル保存コマンド）"] = new List<string>() { "指定されたテキストファイルに現在登録されている住所録情報を保存する" };
+            CommandList[":load ファイルパス （ファイル読み込みコマンド）"] = new List<string>() { "指定されたテキストファイルから住所録データを読み込む",
                 "ファイルの内容のデータにすべて置き換える仕様（既存の登録内容は失われてもよい）",
                 "ファイルは:saveコマンドで出力されたものを指定する前提でOK" };
-            Command[":help （ヘルプコマンド）"] = new List<string>() { "簡易住所録の使い方（各コマンドの使い方）を表示する" };
-            Command[":clear （一括削除コマンド）"] = new List<string>() { "現在登録されている住所録情報をすべて削除する" };
-            Command[":find 項目名 値 （検索コマンド）"] = new List<string>() {"指定された検索対象の項目名と値に合致する住所録データをすべて表示する",
+            CommandList[":help （ヘルプコマンド）"] = new List<string>() { "簡易住所録の使い方（各コマンドの使い方）を表示する" };
+            CommandList[":clear （一括削除コマンド）"] = new List<string>() { "現在登録されている住所録情報をすべて削除する" };
+            CommandList[":find 項目名 値 （検索コマンド）"] = new List<string>() {"指定された検索対象の項目名と値に合致する住所録データをすべて表示する",
                 "例）:find age 22 =>年齢が22才の住所録データを表示",
                 "表示形式は:listコマンドと同じとする" };
-
         }
         public void Sub()//メインで動かすメソッド
         {
+            while (true)
+            {
+                Console.Write("入力>>>");
+                var input = Console.ReadLine().Trim();
+                if (input.Substring(0, 1).Equals(":")){//コマンドが入力された場合
+                    if (ComCheck(ref input))
+                    {
+                        //ここから下をどうにかして縮めたい
+                        if (input.Contains("list"))
+                        {
+                            ShowList();
+                        }else if (input.Contains("exit"))
+                        {
+                            Exit();
+                        }else if (input.Contains("delete"))
+                        {
+                            var inputs=input.Split(' ');
+                            Delete(int.Parse(inputs[1]));
+                        }else if (input.Contains("sort"))
+                        {
+
+                        }else if (input.Contains("save"))
+                        {
+
+                        }else if (input.Contains("load"))
+                        {
+
+                        }else if (input.Contains("help"))
+                        {
+
+                        }else if (input.Contains("clear"))
+                        {
+                            Clear();
+                        }else if (input.Contains("find"))
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("不正なコマンドです");
+                    }
+                }
+                else//コマンド以外が入力された場合
+                {
+                    if (InputCheck(input))
+                    {
+                        var inputs = input.Split(' ');
+                        datalist.Add(new Data(inputs[0], int.Parse(inputs[1]), inputs[2], inputs[3]));
+                    }
+                }
+                
+                
+            }//無限ループ終了
             
+
+
+
         }
         public void ShowList()//一覧表示コマンド
         {
-            int i = 1;
-            foreach(var output in datalist)
+            if (datalist != null)
             {
-                Console.WriteLine("{0}:{1} {2} {3} {4}", i, output.Name, output.Age, output.Telno, output.Address);
-                i++;
+                int i = 1;
+                foreach (var output in datalist)
+                {
+                    Console.WriteLine("{0}:{1} {2} {3} {4}", i, output.Name, output.Age, output.Telno, output.Address);
+                    i++;
+                }
+            }
+            else
+            {
+                Console.WriteLine("何も入っていませんでした。\nデータを取得します");
+                
             }
         }
         public void Exit()//終了コマンド
@@ -848,7 +913,7 @@ namespace Inspection
         {
             try
             {
-                using(var stream = new StreamWriter(filePath,false,Encoding.UTF8))
+                using(var stream = new StreamWriter(filePath,false,Encoding.UTF8))//falseで上書き
                 {
                     foreach(var item in datalist)
                     {
@@ -887,10 +952,10 @@ namespace Inspection
         }
         public void Help()//ヘルプコマンド
         {
-            foreach(var out1 in Command.Keys)
+            foreach(var out1 in CommandList.Keys)
             {
                 Console.WriteLine("{0}",out1);
-                foreach(var out2 in Command[out1])
+                foreach(var out2 in CommandList[out1])
                 {
                     Console.WriteLine("・{0}",out2);
                 }
@@ -905,22 +970,142 @@ namespace Inspection
         {
 
         }
-        public bool InputCheck()
+        public bool InputCheck(string input)//入力とチェック
         {
             //入力のチェック
             //年齢の範囲チェック
             //電話番号のフォーマットチェック
-            //住所のフォーマットチェック
+            //住所の県チェック
 
-
-
-            return true;
+            bool check = true;
+            var inputs = input.Split(' ');
+            //区切り文字の数チェック
+            if (inputs.Length !=4)
+            {
+                check = false;
+            }
+            //年齢の範囲チェック
+            if (int.TryParse(inputs[1],out int num))
+            {
+                if(num<0 || 120 < num)
+                {
+                    check = false;
+                }
+            }
+            else
+            {
+                check = false;
+            }
+            //電話番号のフォーマットチェック
+            if (!Regex.IsMatch(inputs[2], @"0[7-9]0-\d{4}-\d{4}"))
+            {
+                check=false;
+            }
+            //住所の県チェック
+            string[] prefectures = {"北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県",
+                "栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県",
+                "長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
+                "鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県",
+                "長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"};
+            if (check)
+            {
+                bool precheck = false;
+                for(int i = 0; i < prefectures.Length; i++)
+                {
+                    if (inputs[3].Contains(prefectures[i])){
+                        precheck = true;
+                    }
+                }
+                if (!precheck)
+                {
+                    check = false;
+                }
+            }
+            return check;
         }
-        public bool ComCheck()
+        public bool ComCheck(ref string input)//コマンドについてのチェック
         {
             //コマンドのチェック
+            bool check = true;
+            if (input.Equals(":list"))//なくても良い
+            {
+                //check = true;
+            }
+            else if (input.Equals(":exit"))//なくても良い
+            {
+                //check = true;
+            }
+            else if (input.Contains(":delete"))//delete No
+            {
+                var inputs = input.Split(' ');
+                if (inputs.Length != 2)
+                {
+                    check = false;
+                }
+                if (int.TryParse(inputs[1],out int num))
+                {
+                    if (!(num-1 <= datalist.Count))
+                    {
+                        check = false;
+                    }
+                }
+                else
+                {
+                    check = false;
+                }
+            }
+            else if (input.Contains(":sort"))
+            {
+                var inputs=input.Split(' ');
+                if(inputs.Length != 2)
+                {
+                    check = false;
+                }
+                if (!(inputs[1].Equals("name") || inputs[1].Equals("age") || inputs[1].Equals("telno") || inputs[1].Equals("address")))
+                {
+                    check = false;
+                }
+            }
+            else if (input.Contains(":save"))
+            {
+                var inputs = input.Split(' ');
+                if(inputs.Length != 2)
+                {
+                    check = false;
+                }
+                if (!(inputs[1].Substring(inputs[1].Length - 4).Equals(".txt")))
+                {
+                    input.Concat(".txt");
+                }
+            }
+            else if (input.Contains(":load"))
+            {
+                var inputs = input.Split(' ');
+                if (inputs.Length != 2)
+                {
+                    check = false;
+                }
+                if (!(inputs[1].Substring(inputs[1].Length - 4).Equals(".txt")))
+                {
+                    input.Concat(".txt");
+                }
+            }
+            else if (input.Equals(":help"))//なくても良い
+            {
+                //check = true;
+            }
+            else if (input.Equals("clear"))//なくても良い
+            {
+                
+            }
+            else if (input.Contains("find"))
+            {
 
-            return true;
+            }
+
+
+
+            return check;
         }
     }
     public class Data
