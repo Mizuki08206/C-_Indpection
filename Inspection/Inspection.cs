@@ -36,7 +36,11 @@ namespace Inspection
             //Q();
             //Start();
             //S();
-            Dentaku.Dntk();
+            //Dentaku.Dntk();
+            //T();
+
+            Address ad = new Address();
+            ad.Help();
 
         }
         public static void T()
@@ -726,7 +730,214 @@ namespace Inspection
             return flag;
         }
     }
-    //====================================================
+    //----------------------------------------------------
+    public class Address
+    {
+        public Dictionary<string, List<string>> Command { get; set; } = new Dictionary<string, List<string>>();
+        public List<Data> datalist=new List<Data>();
+
+        public Address()//コマンドの格納（ここは省略できない気がする...）
+        {
+            Command[":list （一覧表示コマンド）"] = new List<string>() {"現在登録されている住所録データをすべて表示する",
+                "表示形式は、先頭に通し番号（1スタート）を表示したうえで、登録された情報を半角スペース区切りで表示する" };
+            Command[":exit （終了コマンド）"] = new List<string>() { "アプリケーションを終了する" };
+            Command[":delete no （削除コマンド）"] = new List<string>() { "noで指定された通し番号（一覧表示時のNo）のデータを削除する",
+                "削除後、通し番号は先頭から振り直される",
+                "追加の情報は、半角スペースの後に続く仕様とする" };
+            Command[":sort 項目名 （ソートコマンド）"] = new List<string>() { "項目名で指定された項目の昇順でデータをソートする",
+                "有効な項目名は name,age,telno,address のいずれかとする" };
+            Command[":save ファイルパス （ファイル保存コマンド）"] = new List<string>() { "指定されたテキストファイルに現在登録されている住所録情報を保存する" };
+            Command[":load ファイルパス （ファイル読み込みコマンド）"] = new List<string>() { "指定されたテキストファイルから住所録データを読み込む",
+                "ファイルの内容のデータにすべて置き換える仕様（既存の登録内容は失われてもよい）",
+                "ファイルは:saveコマンドで出力されたものを指定する前提でOK" };
+            Command[":help （ヘルプコマンド）"] = new List<string>() { "簡易住所録の使い方（各コマンドの使い方）を表示する" };
+            Command[":clear （一括削除コマンド）"] = new List<string>() { "現在登録されている住所録情報をすべて削除する" };
+            Command[":find 項目名 値 （検索コマンド）"] = new List<string>() {"指定された検索対象の項目名と値に合致する住所録データをすべて表示する",
+                "例）:find age 22 =>年齢が22才の住所録データを表示",
+                "表示形式は:listコマンドと同じとする" };
+
+        }
+        public void Sub()//メインで動かすメソッド
+        {
+            
+        }
+        public void ShowList()//一覧表示コマンド
+        {
+            int i = 1;
+            foreach(var output in datalist)
+            {
+                Console.WriteLine("{0}:{1} {2} {3} {4}", i, output.Name, output.Age, output.Telno, output.Address);
+                i++;
+            }
+        }
+        public void Exit()//終了コマンド
+        {
+            Application.Exit();//Environment.Exit(0)かもしれない
+        }
+        public void Delete(int no)//削除コマンド
+        {
+            Console.WriteLine("{0}:{1}を削除しました。", no, datalist[no - 1].Name);
+            datalist.RemoveAt(no-1);
+        }
+        public void Sort(string input)//ソートコマンド
+        {
+            if (input.Equals("name") || input.Equals("age") || input.Equals("telno") || input.Equals("address"))
+            {
+                switch (input)
+                {
+                    case "name":
+                        for(int i = 0; i < datalist.Count; i++)
+                        {
+                            for(int j = i; j < datalist.Count; j++)
+                            {
+                                if(string.Compare(datalist[i].Name , datalist[j].Name)>0)
+                                {
+                                    var tmp=datalist[i];
+                                    datalist[i] = datalist[j];
+                                    datalist[j] = tmp;
+                                }
+                            }
+                        }
+                        break;
+                    case "age":
+                        for (int i = 0; i < datalist.Count; i++)
+                        {
+                            for (int j = i; j < datalist.Count; j++)
+                            {
+                                if (datalist[i].Age > datalist[j].Age)
+                                {
+                                    var tmp = datalist[i];
+                                    datalist[i] = datalist[j];
+                                    datalist[j] = tmp;
+                                }
+                            }
+                        }
+                        break;
+                    case "telno":
+                        for (int i = 0; i < datalist.Count; i++)
+                        {
+                            for (int j = i; j < datalist.Count; j++)
+                            {
+                                if (string.Compare(datalist[i].Telno, datalist[j].Telno) > 0)
+                                {
+                                    var tmp = datalist[i];
+                                    datalist[i] = datalist[j];
+                                    datalist[j] = tmp;
+                                }
+                            }
+                        }
+                        break;
+                    case "address":
+                        for (int i = 0; i < datalist.Count; i++)
+                        {
+                            for (int j = i; j < datalist.Count; j++)
+                            {
+                                if (string.Compare(datalist[i].Address, datalist[j].Address) > 0)
+                                {
+                                    var tmp = datalist[i];
+                                    datalist[i] = datalist[j];
+                                    datalist[j] = tmp;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        public void Save(string filePath)//ファイル保存コマンド
+        {
+            try
+            {
+                using(var stream = new StreamWriter(filePath,false,Encoding.UTF8))
+                {
+                    foreach(var item in datalist)
+                    {
+                        stream.Write("{0} {1} {2} {3}", item.Name, item.Age, item.Telno, item.Address);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("\n\nファイルを開くことができませんでした。");
+            }
+        }
+        public void Load(string filePath)//ファイル読み込みコマンド
+        {
+            try
+            {
+                using(var stream=new StreamReader(filePath))
+                {
+                    var tmplist = new List<Data>();
+                    while (!stream.EndOfStream)
+                    {
+                        var inputs = stream.ReadLine().Split(' ');
+                        tmplist.Add(new Data(inputs[0], int.Parse(inputs[1]), inputs[2], inputs[3]));
+                    }
+                    datalist = tmplist;
+                    tmplist = null;
+
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("\n\nファイルを開くことができませんでした。");
+            }
+        }
+        public void Help()//ヘルプコマンド
+        {
+            foreach(var out1 in Command.Keys)
+            {
+                Console.WriteLine("{0}",out1);
+                foreach(var out2 in Command[out1])
+                {
+                    Console.WriteLine("・{0}",out2);
+                }
+                Console.WriteLine();
+            }
+        }
+        public void Clear()//一括削除コマンド
+        {
+            datalist.Clear();
+        }
+        public void Find()//検索コマンド
+        {
+
+        }
+        public bool InputCheck()
+        {
+            //入力のチェック
+            //年齢の範囲チェック
+            //電話番号のフォーマットチェック
+            //住所のフォーマットチェック
+
+
+
+            return true;
+        }
+        public bool ComCheck()
+        {
+            //コマンドのチェック
+
+            return true;
+        }
+    }
+    public class Data
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Telno { get; set; }
+        public string Address { get; set; }
+        public Data(string name,int age,string telno,string address)
+        {
+            this.Name = name;
+            this.Age = age;
+            this.Telno = telno;
+            this.Address = address;
+        }
+    }
+    //----------------------------------------------------
 
     public static class ESample//staticクラスにする必要がある。Sampleクラスの拡張メソッドを定義
     {
