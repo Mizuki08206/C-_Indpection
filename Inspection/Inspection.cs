@@ -756,45 +756,54 @@ namespace Inspection
             CommandList[":find 項目名 値 （検索コマンド）"] = new List<string>() {"指定された検索対象の項目名と値に合致する住所録データをすべて表示する",
                 "例）:find age 22 =>年齢が22才の住所録データを表示",
                 "表示形式は:listコマンドと同じとする" };
+            
         }
         public void Sub()//メインで動かすメソッド
         {
+            Load("data.txt");
             while (true)
             {
                 Console.Write("入力>>>");
                 var input = Console.ReadLine().Trim();
+                if (String.IsNullOrEmpty(input))
+                {
+                    continue;
+                }
                 if (input.Substring(0, 1).Equals(":")){//コマンドが入力された場合
-                    if (ComCheck(ref input))
+                    //Console.WriteLine(":は入力されている");
+                    if (ComCheck(input))
                     {
-                        //ここから下をどうにかして縮めたい
+                        Console.WriteLine(ComCheck(input));
+                        //ここから下をどうにかして縮めたいけど思いつかない
                         if (input.Contains("list"))
                         {
                             ShowList();
                         }else if (input.Contains("exit"))
                         {
                             Exit();
+                            break;
                         }else if (input.Contains("delete"))
                         {
                             var inputs=input.Split(' ');
                             Delete(int.Parse(inputs[1]));
                         }else if (input.Contains("sort"))
                         {
-
+                            Sort(input);
                         }else if (input.Contains("save"))
                         {
-
+                            Save(input);
                         }else if (input.Contains("load"))
                         {
-
+                            Load(input);
                         }else if (input.Contains("help"))
                         {
-
+                            Help();
                         }else if (input.Contains("clear"))
                         {
                             Clear();
                         }else if (input.Contains("find"))
                         {
-
+                            Find(input);
                         }
                     }
                     else
@@ -808,35 +817,37 @@ namespace Inspection
                     {
                         var inputs = input.Split(' ');
                         datalist.Add(new Data(inputs[0], int.Parse(inputs[1]), inputs[2], inputs[3]));
+                        Console.WriteLine("{0}を登録しました。", inputs[0]);
+                    }
+                    else
+                    {
+                        Console.WriteLine("登録できません。フォーマットを確認してください。\n名前 年齢 電話番号 住所（半角スペース区切り）");
                     }
                 }
-                
-                
             }//無限ループ終了
-            
-
-
-
         }
         public void ShowList()//一覧表示コマンド
         {
             if (datalist != null)
             {
                 int i = 1;
+                Console.WriteLine("=====================================");
                 foreach (var output in datalist)
                 {
                     Console.WriteLine("{0}:{1} {2} {3} {4}", i, output.Name, output.Age, output.Telno, output.Address);
                     i++;
                 }
+                Console.WriteLine("=====================================");
             }
             else
             {
                 Console.WriteLine("何も入っていませんでした。\nデータを取得します");
-                
+                Load("data");
             }
         }
         public void Exit()//終了コマンド
         {
+            Console.WriteLine("終了します。");
             Application.Exit();//Environment.Exit(0)かもしれない
         }
         public void Delete(int no)//削除コマンド
@@ -846,9 +857,11 @@ namespace Inspection
         }
         public void Sort(string input)//ソートコマンド
         {
-            if (input.Equals("name") || input.Equals("age") || input.Equals("telno") || input.Equals("address"))
+            var inputs=input.Split(' ');
+            Console.WriteLine("{0}でソートします。。。", inputs[1]);
+            if (inputs[1].Equals("name") || inputs[1].Equals("age") || inputs[1].Equals("telno") || inputs[1].Equals("address"))
             {
-                switch (input)
+                switch (inputs[1])
                 {
                     case "name":
                         for(int i = 0; i < datalist.Count; i++)
@@ -913,12 +926,14 @@ namespace Inspection
         {
             try
             {
+                filePath = "data.txt";//ファイルが分散しないように書き換えてしまおう
                 using(var stream = new StreamWriter(filePath,false,Encoding.UTF8))//falseで上書き
                 {
                     foreach(var item in datalist)
                     {
-                        stream.Write("{0} {1} {2} {3}", item.Name, item.Age, item.Telno, item.Address);
+                        stream.Write("{0} {1} {2} {3}\n", item.Name, item.Age, item.Telno, item.Address);
                     }
+                    Console.WriteLine("データを書き込みました。");
                 }
             }
             catch(Exception e)
@@ -931,7 +946,8 @@ namespace Inspection
         {
             try
             {
-                using(var stream=new StreamReader(filePath))
+                filePath = "data.txt";//ファイルが分散しないように書き換えてしまおう
+                using (var stream=new StreamReader(filePath))
                 {
                     var tmplist = new List<Data>();
                     while (!stream.EndOfStream)
@@ -941,7 +957,7 @@ namespace Inspection
                     }
                     datalist = tmplist;
                     tmplist = null;
-
+                    Console.WriteLine("読み込みました。");
                 }
             }
             catch(Exception e)
@@ -952,23 +968,68 @@ namespace Inspection
         }
         public void Help()//ヘルプコマンド
         {
-            foreach(var out1 in CommandList.Keys)
+            Console.WriteLine("=====================================");
+            foreach (var out1 in CommandList.Keys)
             {
                 Console.WriteLine("{0}",out1);
                 foreach(var out2 in CommandList[out1])
                 {
                     Console.WriteLine("・{0}",out2);
                 }
-                Console.WriteLine();
+                Console.WriteLine("-------------------------------------");
             }
+            Console.WriteLine("=====================================");
         }
         public void Clear()//一括削除コマンド
         {
             datalist.Clear();
+            Console.WriteLine("リストを一括削除しました。");
         }
-        public void Find()//検索コマンド
+        public void Find(string input)//検索コマンド
         {
+            var inputs = input.Split(' ');
+            Console.WriteLine("=====================================");
+            if (inputs[1].Equals("name"))
+            {
 
+                foreach (Data data in datalist)
+                {
+                    if (data.Name.Equals(inputs[3]))
+                    {
+                        Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
+                    }
+                }
+            }else if (inputs[1].Equals("age"))
+            {
+                foreach (Data data in datalist)
+                {
+                    if (data.Age.Equals(inputs[3]))
+                    {
+                        Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
+                    }
+                }
+            }
+            else if (inputs[1].Equals("telno"))
+            {
+                foreach (Data data in datalist)
+                {
+                    if (data.Telno.Equals(inputs[3]))
+                    {
+                        Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
+                    }
+                }
+            }
+            else if (inputs[1].Equals("address"))
+            {
+                foreach (Data data in datalist)
+                {
+                    if (data.Address.Equals(inputs[3]))
+                    {
+                        Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
+                    }
+                }
+            }
+            Console.WriteLine("=====================================");
         }
         public bool InputCheck(string input)//入力とチェック
         {
@@ -983,6 +1044,7 @@ namespace Inspection
             if (inputs.Length !=4)
             {
                 check = false;
+                return check;
             }
             //年齢の範囲チェック
             if (int.TryParse(inputs[1],out int num))
@@ -990,6 +1052,7 @@ namespace Inspection
                 if(num<0 || 120 < num)
                 {
                     check = false;
+                    return check;
                 }
             }
             else
@@ -1000,6 +1063,7 @@ namespace Inspection
             if (!Regex.IsMatch(inputs[2], @"0[7-9]0-\d{4}-\d{4}"))
             {
                 check=false;
+                return check;
             }
             //住所の県チェック
             string[] prefectures = {"北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県",
@@ -1019,11 +1083,12 @@ namespace Inspection
                 if (!precheck)
                 {
                     check = false;
+                    return check;
                 }
             }
             return check;
         }
-        public bool ComCheck(ref string input)//コマンドについてのチェック
+        public bool ComCheck(string input)//コマンドについてのチェック
         {
             //コマンドのチェック
             bool check = true;
@@ -1041,17 +1106,20 @@ namespace Inspection
                 if (inputs.Length != 2)
                 {
                     check = false;
+                    return check;
                 }
                 if (int.TryParse(inputs[1],out int num))
                 {
                     if (!(num-1 <= datalist.Count))
                     {
                         check = false;
+                        return check;
                     }
                 }
                 else
                 {
                     check = false;
+                    return check;
                 }
             }
             else if (input.Contains(":sort"))
@@ -1060,10 +1128,12 @@ namespace Inspection
                 if(inputs.Length != 2)
                 {
                     check = false;
+                    return check;
                 }
                 if (!(inputs[1].Equals("name") || inputs[1].Equals("age") || inputs[1].Equals("telno") || inputs[1].Equals("address")))
                 {
                     check = false;
+                    return check;
                 }
             }
             else if (input.Contains(":save"))
@@ -1072,10 +1142,12 @@ namespace Inspection
                 if(inputs.Length != 2)
                 {
                     check = false;
+                    return check;
                 }
-                if (!(inputs[1].Substring(inputs[1].Length - 4).Equals(".txt")))
+                if (!(inputs[1].Contains(".txt")))
                 {
                     input.Concat(".txt");
+                    return check;
                 }
             }
             else if (input.Contains(":load"))
@@ -1084,8 +1156,9 @@ namespace Inspection
                 if (inputs.Length != 2)
                 {
                     check = false;
+                    return check;
                 }
-                if (!(inputs[1].Substring(inputs[1].Length - 4).Equals(".txt")))
+                if (!(inputs[1].Contains(".txt")))
                 {
                     input.Concat(".txt");
                 }
@@ -1094,16 +1167,36 @@ namespace Inspection
             {
                 //check = true;
             }
-            else if (input.Equals("clear"))//なくても良い
+            else if (input.Equals(":clear"))//なくても良い
             {
-                
+                //check=true;
             }
-            else if (input.Contains("find"))
+            else if (input.Contains(":find"))
             {
-
+                var inputs=input.Split(' ');
+                if (inputs.Length != 3)
+                {
+                    check = false;
+                    return check;
+                }
+                if (!(inputs[1].Equals("name") || inputs[1].Equals("age") || inputs[1].Equals("telno") || inputs[1].Equals("address")))
+                {
+                    check = false;
+                    return check;
+                }
+                if (inputs[1].Equals("age"))
+                {
+                    if (!(int.TryParse(inputs[2],out int age)))
+                    {
+                        check=false;
+                        return check;
+                    }
+                }
             }
-
-
+            else
+            {
+                check = false;
+            }
 
             return check;
         }
