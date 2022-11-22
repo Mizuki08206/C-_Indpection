@@ -14,3 +14,11 @@ C:\Users\m-otomo\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.cspr
 C:\Users\m-otomo\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.csproj.CoreCompileInputs.cache
 C:\Users\m-otomo\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.exe
 C:\Users\m-otomo\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.pdb
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\bin\Debug\Inspection.exe.config
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\bin\Debug\Inspection.exe
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\bin\Debug\Inspection.pdb
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.csproj.AssemblyReference.cache
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.csproj.SuggestedBindingRedirects.cache
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.csproj.CoreCompileInputs.cache
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.exe
+C:\Users\mizuk\Source\Repos\C-_Inspection\Inspection\obj\Debug\Inspection.pdb

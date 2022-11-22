@@ -40,8 +40,10 @@ namespace Inspection
             //Dentaku.Dntk();
             //T();
 
+            /*簡易住所録
             Address ad = new Address();
             ad.Sub();
+            */
 
         }
         public static void T()
@@ -479,6 +481,8 @@ namespace Inspection
         }
     }
     //----------------------------------------------------
+    //簡易電卓アプリ
+    //----------------------------------------------------
     public class Dentaku
     {
         //TestCase
@@ -732,6 +736,8 @@ namespace Inspection
         }
     }
     //----------------------------------------------------
+    //簡易住所録
+    //----------------------------------------------------
     public class Address
     {
         public Dictionary<string, List<string>> CommandList { get; set; } = new Dictionary<string, List<string>>();
@@ -819,10 +825,10 @@ namespace Inspection
                         datalist.Add(new Data(inputs[0], int.Parse(inputs[1]), inputs[2], inputs[3]));
                         Console.WriteLine("{0}を登録しました。", inputs[0]);
                     }
-                    else
-                    {
-                        Console.WriteLine("登録できません。フォーマットを確認してください。\n名前 年齢 電話番号 住所（半角スペース区切り）");
-                    }
+                    //else
+                    //{
+                    //    Console.WriteLine("登録できません。フォーマットを確認してください。\n名前 年齢 電話番号 住所（半角スペース区切り）");
+                    //}
                 }
             }//無限ループ終了
         }
@@ -987,6 +993,11 @@ namespace Inspection
         }
         public void Find(string input)//検索コマンド
         {
+            if (datalist.Count == 0)
+            {
+                Console.WriteLine("データが入っていません");
+                return;
+            }
             var inputs = input.Split(' ');
             Console.WriteLine("=====================================");
             if (inputs[1].Equals("name"))
@@ -994,7 +1005,7 @@ namespace Inspection
 
                 foreach (Data data in datalist)
                 {
-                    if (data.Name.Equals(inputs[3]))
+                    if (data.Name.Equals(inputs[2]))
                     {
                         Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
                     }
@@ -1003,7 +1014,7 @@ namespace Inspection
             {
                 foreach (Data data in datalist)
                 {
-                    if (data.Age.Equals(inputs[3]))
+                    if (data.Age==int.Parse(inputs[2]))
                     {
                         Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
                     }
@@ -1013,7 +1024,7 @@ namespace Inspection
             {
                 foreach (Data data in datalist)
                 {
-                    if (data.Telno.Equals(inputs[3]))
+                    if (data.Telno.Equals(inputs[2]))
                     {
                         Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
                     }
@@ -1023,7 +1034,7 @@ namespace Inspection
             {
                 foreach (Data data in datalist)
                 {
-                    if (data.Address.Equals(inputs[3]))
+                    if (data.Address.Equals(inputs[2]))
                     {
                         Console.WriteLine("{0} {1} {2} {3}", data.Name, data.Age, data.Telno, data.Address);
                     }
@@ -1044,6 +1055,7 @@ namespace Inspection
             if (inputs.Length !=4)
             {
                 check = false;
+                Console.WriteLine("登録できません。フォーマットを確認してください。\n名前 年齢 電話番号 住所（半角スペース区切り）");
                 return check;
             }
             //年齢の範囲チェック
@@ -1052,17 +1064,20 @@ namespace Inspection
                 if(num<0 || 120 < num)
                 {
                     check = false;
+                    Console.WriteLine("年齢は0～120の範囲で入力してください");
                     return check;
                 }
             }
             else
             {
+                Console.WriteLine("年齢は数値で入力してください");
                 check = false;
             }
             //電話番号のフォーマットチェック
             if (!Regex.IsMatch(inputs[2], @"0[7-9]0-\d{4}-\d{4}"))
             {
                 check=false;
+                Console.WriteLine("電話番号は「070-1234-5678」形式です。070or080or090");
                 return check;
             }
             //住所の県チェック
@@ -1083,6 +1098,7 @@ namespace Inspection
                 if (!precheck)
                 {
                     check = false;
+                    Console.WriteLine("都道府県が一致しませんでした。");
                     return check;
                 }
             }
@@ -1106,6 +1122,7 @@ namespace Inspection
                 if (inputs.Length != 2)
                 {
                     check = false;
+                    Console.WriteLine("「delete No」形式で入力してください");
                     return check;
                 }
                 if (int.TryParse(inputs[1],out int num))
@@ -1113,12 +1130,14 @@ namespace Inspection
                     if (!(num-1 <= datalist.Count))
                     {
                         check = false;
+                        Console.WriteLine("「delte No」Noは整数値");
                         return check;
                     }
                 }
                 else
                 {
                     check = false;
+                    Console.WriteLine("「delete No」Noは整数値");
                     return check;
                 }
             }
@@ -1128,11 +1147,13 @@ namespace Inspection
                 if(inputs.Length != 2)
                 {
                     check = false;
+                    Console.WriteLine("「sort 項目名」項目名はname,age,telno,address");
                     return check;
                 }
                 if (!(inputs[1].Equals("name") || inputs[1].Equals("age") || inputs[1].Equals("telno") || inputs[1].Equals("address")))
                 {
                     check = false;
+                    Console.WriteLine("「sort 項目名」項目名はname,age,telno,address");
                     return check;
                 }
             }
